@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
 import * as XLSX from 'xlsx'
-import { Users, Download, Upload, Info } from 'lucide-react'
+import { Users, Download, Upload, Info, Box, Image as ImageIcon, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
+import ForceGraph3D from 'react-force-graph-3d'
+import { useCallback, useRef, useEffect } from 'react'
 import AddPersonForm from './components/AddPersonForm'
 import AddRelationForm from './components/AddRelationForm'
 import FilterPanel, { RELATION_TYPES } from './components/FilterPanel'
@@ -27,10 +29,24 @@ interface GraphData {
 }
 
 export default function App() {
-  const [nodes, setNodes] = useState<Person[]>([])
-  const [links, setLinks] = useState<Relation[]>([])
+  const [nodes, setNodes] = useState<Person[]>(() => {
+    const saved = localStorage.getItem('rg_nodes')
+    return saved ? JSON.parse(saved) : []
+  })
+  const [links, setLinks] = useState<Relation[]>(() => {
+    const saved = localStorage.getItem('rg_links')
+    return saved ? JSON.parse(saved) : []
+  })
   const [selectedNode, setSelectedNode] = useState<Person | null>(null)
   const [filters, setFilters] = useState({ search: '', genre: 'Tous', relation: 'Toutes' })
+  const [is3D, setIs3D] = useState(false)
+  const graphRef = useRef<any>()
+
+  // Persistence
+  useEffect(() => {
+    localStorage.setItem('rg_nodes', JSON.stringify(nodes))
+    localStorage.setItem('rg_links', JSON.stringify(links))
+  }, [nodes, links])
 
   // Calcule la donnée pour le graphe (ajoute la valeur proportionnelle au nombre de liens)
   const graphData = useMemo((): GraphData => {
@@ -163,20 +179,36 @@ export default function App() {
           {/* Données */}
           <section>
             <h2 className="text-xs font-semibold text-foreground/40 uppercase mb-3 flex items-center gap-2">
-              <Download size={14} /> Données
+              <Box size={14} /> Affichage & Outils
             </h2>
             <div className="grid grid-cols-2 gap-2">
-              <label className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition-all border border-white/5 hover:border-primary/30 group">
-                <Upload size={20} className="mb-1 group-hover:text-primary transition-colors" />
-                <span className="text-xs">Importer</span>
-                <input type="file" accept=".xlsx" className="hidden" onChange={handleImport} />
-              </label>
               <button 
-                onClick={handleExport}
-                className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition-all border border-white/5 hover:border-accent/30 group"
+                onClick={() => setIs3D(!is3D)}
+                className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all group ${
+                  is3D ? 'bg-primary/20 border-primary' : 'bg-white/5 border-white/5 hover:bg-white/10'
+                }`}
               >
-                <Download size={20} className="mb-1 group-hover:text-accent transition-colors" />
-                <span className="text-xs">Exporter</span>
+                <Box size={20} className={is3D ? 'text-primary' : 'group-hover:text-primary'} />
+                <span className="text-[10px] mt-1">{is3D ? 'Mode 2D' : 'Mode 3D'}</span>
+              </button>
+              <button 
+                onClick={() => {
+                  try {
+                    if (graphRef.current) {
+                      const canvas = graphRef.current.getCanvasElement()
+                      const img = canvas.toDataURL("image/png")
+                      const link = document.createElement('a')
+                      link.download = 'relation_graph_snapshot.png'
+                      link.href = img
+                      link.click()
+                      toast.success("Snapshot enregistré !")
+                    }
+                  } catch (e) { toast.error("Erreur capture") }
+                }}
+                className="flex flex-col items-center justify-center p-3 rounded-xl bg-white/5 hover:bg-white/10 cursor-pointer transition-all border border-white/5 group"
+              >
+                <ImageIcon size={20} className="group-hover:text-accent" />
+                <span className="text-[10px] mt-1">Snapshot</span>
               </button>
             </div>
           </section>
@@ -236,44 +268,54 @@ export default function App() {
       {/* Graphe */}
       <main className="flex-1 relative bg-[#0f0d13]">
         <div className="absolute inset-0 z-0">
-          <ForceGraph2D
-            graphData={graphData}
-            nodeLabel={(node: any) => `${node.nom} (${node.genre})`}
-            nodeColor={(node: any) => node.genre === 'Garçon' ? '#3B82F6' : '#F43F5E'}
-            nodeRelSize={4}
-            linkColor={(link: any) => {
-              return (RELATION_TYPES as any)[link.type] || "#4B5563"
-            }}
-            linkDirectionalParticles={1}
-            linkDirectionalParticleSpeed={0.005}
-            linkWidth={1.5}
-            nodeCanvasObject={(node: any, ctx, globalScale) => {
-              const label = node.nom;
-              const fontSize = 12 / globalScale;
-              ctx.font = `${fontSize}px Fira Sans`;
-              
-              // Node Circle
-              ctx.beginPath();
-              ctx.arc(node.x, node.y, node.val, 0, 2 * Math.PI, false);
-              ctx.fillStyle = node.genre === 'Garçon' ? '#3B82F6' : '#F43F5E';
-              ctx.fill();
+          {is3D ? (
+            <ForceGraph3D
+              ref={graphRef}
+              graphData={graphData}
+              nodeLabel={(node: any) => `${node.nom} (${node.genre})`}
+              nodeColor={(node: any) => node.genre === 'Garçon' ? '#3B82F6' : '#F43F5E'}
+              nodeRelSize={4}
+              linkColor={(link: any) => (RELATION_TYPES as any)[link.type] || "#4B5563"}
+              linkWidth={1.5}
+              backgroundColor="#0f0d13"
+              onNodeClick={(node: any) => setSelectedNode(node)}
+            />
+          ) : (
+            <ForceGraph2D
+              ref={graphRef}
+              graphData={graphData}
+              nodeLabel={(node: any) => `${node.nom} (${node.genre})`}
+              nodeColor={(node: any) => node.genre === 'Garçon' ? '#3B82F6' : '#F43F5E'}
+              nodeRelSize={4}
+              linkColor={(link: any) => (RELATION_TYPES as any)[link.type] || "#4B5563"}
+              linkDirectionalParticles={1}
+              linkDirectionalParticleSpeed={0.005}
+              linkWidth={1.5}
+              nodeCanvasObject={(node: any, ctx, globalScale) => {
+                const label = node.nom;
+                const fontSize = 12 / globalScale;
+                ctx.font = `${fontSize}px Fira Sans`;
+                
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.val, 0, 2 * Math.PI, false);
+                ctx.fillStyle = node.genre === 'Garçon' ? '#3B82F6' : '#F43F5E';
+                ctx.fill();
 
-              // Border if selected
-              if (selectedNode && node.id === selectedNode.id) {
-                ctx.strokeStyle = '#FFFFFF';
-                ctx.lineWidth = 2 / globalScale;
-                ctx.stroke();
-              }
+                if (selectedNode && node.id === selectedNode.id) {
+                  ctx.strokeStyle = '#FFFFFF';
+                  ctx.lineWidth = 2 / globalScale;
+                  ctx.stroke();
+                }
 
-              // Text
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.fillStyle = '#FFFFFF';
-              ctx.fillText(label, node.x, node.y + node.val + 8/globalScale);
-            }}
-            onNodeClick={(node: any) => setSelectedNode(node)}
-            backgroundColor="#0f0d13"
-          />
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillText(label, node.x, node.y + node.val + 8/globalScale);
+              }}
+              onNodeClick={(node: any) => setSelectedNode(node)}
+              backgroundColor="#0f0d13"
+            />
+          )}
         </div>
 
         {/* Légende Dynamique */}
