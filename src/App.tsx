@@ -5,6 +5,8 @@ import { Users, Download, Upload, Info } from 'lucide-react'
 import { toast } from 'sonner'
 import AddPersonForm from './components/AddPersonForm'
 import AddRelationForm from './components/AddRelationForm'
+import FilterPanel, { RELATION_TYPES } from './components/FilterPanel'
+import AIAnalysisSection from './components/AIAnalysisSection'
 
 // Types
 interface Person {
@@ -28,21 +30,40 @@ export default function App() {
   const [nodes, setNodes] = useState<Person[]>([])
   const [links, setLinks] = useState<Relation[]>([])
   const [selectedNode, setSelectedNode] = useState<Person | null>(null)
+  const [filters, setFilters] = useState({ search: '', genre: 'Tous', relation: 'Toutes' })
 
   // Calcule la donnée pour le graphe (ajoute la valeur proportionnelle au nombre de liens)
   const graphData = useMemo((): GraphData => {
+    // Application des filtres
+    const filteredNodes = nodes.filter(node => {
+      const matchSearch = node.nom.toLowerCase().includes(filters.search.toLowerCase())
+      const matchGenre = filters.genre === 'Tous' || node.genre === filters.genre
+      return matchSearch && matchGenre
+    })
+
+    const filteredLinks = links.filter(link => {
+      const sId = typeof link.source === 'object' ? (link.source as any).id : link.source
+      const tId = typeof link.target === 'object' ? (link.target as any).id : link.target
+      
+      const sInNodes = filteredNodes.some(n => n.id === sId)
+      const tInNodes = filteredNodes.some(n => n.id === tId)
+      const matchRelation = filters.relation === 'Toutes' || link.type === filters.relation
+
+      return sInNodes && tInNodes && matchRelation
+    })
+
     return {
-      nodes: nodes.map(node => ({
+      nodes: filteredNodes.map(node => ({
         ...node,
-        val: links.filter(l => {
+        val: filteredLinks.filter(l => {
           const sId = typeof l.source === 'object' ? (l.source as any).id : l.source
           const tId = typeof l.target === 'object' ? (l.target as any).id : l.target
           return sId === node.id || tId === node.id
         }).length + 5
       })),
-      links: links
+      links: filteredLinks
     }
-  }, [nodes, links])
+  }, [nodes, links, filters])
 
   // Import Excel
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,6 +181,9 @@ export default function App() {
             </div>
           </section>
 
+          {/* Filtres */}
+          <FilterPanel onFilterChange={setFilters} />
+
           {/* Formulaires CRUD */}
           <section className="space-y-4">
             <AddPersonForm onAdd={(nom: string, genre: 'Garçon' | 'Fille') => {
@@ -189,6 +213,9 @@ export default function App() {
                 </div>
              </div>
           </section>
+
+          {/* AI Analyzer */}
+          <AIAnalysisSection graphData={graphData} />
         </div>
         
         <div className="p-4 border-t border-white/10 bg-black/20 text-center">
@@ -215,10 +242,7 @@ export default function App() {
             nodeColor={(node: any) => node.genre === 'Garçon' ? '#3B82F6' : '#F43F5E'}
             nodeRelSize={4}
             linkColor={(link: any) => {
-              if (link.type === "Ont couché ensemble") return "#EF4444"
-              if (link.type === "Se sont embrassé") return "#EC4899"
-              if (link.type === "Sont sortie ensemble") return "#8B5CF6"
-              return "#4B5563"
+              return (RELATION_TYPES as any)[link.type] || "#4B5563"
             }}
             linkDirectionalParticles={1}
             linkDirectionalParticleSpeed={0.005}
@@ -252,31 +276,25 @@ export default function App() {
           />
         </div>
 
-        {/* Légende */}
-        <div className="absolute top-6 right-6 p-4 glass rounded-2xl flex flex-col gap-3 pointer-events-none">
+        {/* Légende Dynamique */}
+        <div className="absolute top-6 right-6 p-4 glass rounded-2xl flex flex-col gap-3 pointer-events-none max-h-[80vh] overflow-y-auto w-48">
           <h4 className="text-[10px] font-bold uppercase tracking-widest text-foreground/40">Légende</h4>
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-[11px]">
-              <span className="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" /> 
-              <span>Couché ensemble</span>
-            </div>
-            <div className="flex items-center gap-2 text-[11px]">
-              <span className="w-3 h-3 rounded-full bg-pink-500 shadow-[0_0_8px_rgba(236,72,153,0.5)]" /> 
-              <span>Embrassé</span>
-            </div>
-            <div className="flex items-center gap-2 text-[11px]">
-              <span className="w-3 h-3 rounded-full bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.5)]" /> 
-              <span>Sortie ensemble</span>
-            </div>
+            {Object.entries(RELATION_TYPES).map(([type, color]) => (
+              <div key={type} className="flex items-center gap-2 text-[10px]">
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: color, boxShadow: `0 0 8px ${color}80` }} /> 
+                <span className="truncate">{type}</span>
+              </div>
+            ))}
           </div>
           <div className="h-[1px] bg-white/10 my-1" />
           <div className="space-y-2">
-             <div className="flex items-center gap-2 text-[11px]">
-              <span className="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" /> 
+             <div className="flex items-center gap-2 text-[10px]">
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" /> 
               <span>Garçon</span>
             </div>
-            <div className="flex items-center gap-2 text-[11px]">
-              <span className="w-3 h-3 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" /> 
+            <div className="flex items-center gap-2 text-[10px]">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]" /> 
               <span>Fille</span>
             </div>
           </div>

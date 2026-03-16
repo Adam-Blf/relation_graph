@@ -62,6 +62,15 @@ export default function AddRelationForm({ nodes, onAdd }: AddRelationFormProps) 
         onChange={(e) => setType(e.target.value)}
         className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent/50 transition-colors appearance-none"
       >
+        <option value="Ami">Ami</option>
+        <option value="Ennemi">Ennemi</option>
+        <option value="Crush">Crush</option>
+        <option value="Crush réciproque">Crush réciproque</option>
+        <option value="Flirt">Flirt</option>
+        <option value="Ex">Ex</option>
+        <option value="Famille">Famille</option>
+        <option value="Pro">Pro</option>
+        <option value="Rivalité">Rivalité</option>
         <option value="Ont couché ensemble">Ont couché ensemble</option>
         <option value="Se sont embrassé">Se sont embrassé</option>
         <option value="Sont sortie ensemble">Sont sortie ensemble</option>
