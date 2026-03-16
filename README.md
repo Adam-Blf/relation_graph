@@ -1,15 +1,16 @@
 # Relation Graph 📊
 
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Version](https://img.shields.io/badge/version-0.2.0-blue)
 ![Status](https://img.shields.io/badge/status-ready-success)
 
 Visualisation interactive des relations sociales entre individus sous forme de graphe à nœuds.
 
 ## 🚀 Fonctionnalités
 
+- **Filtres Avancés** : Recherche par nom, filtrage par genre et type de relation.
+- **AI Analyzer** : Module d'analyse structurelle du graphe et accès aux ressources LLM gratuites.
+- **Types de Relations Étendus** : 12 types de relations (Ami, Crush, Rivalité, etc.).
 - **Graphe Interactif** : Visualisation 2D dynamique avec zoom et physique.
-- **Import/Export Excel** : Chargez vos données directement depuis un fichier `.xlsx`.
-- **CRUD Complet** : Ajoutez des individus et créez des liens directement dans l'application.
 - **Design Premium** : Interface Dark Mode avec effets de flou (Glassmorphism).
 - **Légende Sémantique** : Couleurs distinctes pour les types de relations.
 
