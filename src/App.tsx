@@ -44,6 +44,7 @@ export default function App() {
   const [is3D, setIs3D] = useState(false)
   const [search, setSearch] = useState('')
   const [activeFilters, setActiveFilters] = useState<string[]>([])
+  const [showLegend, setShowLegend] = useState(true)
   const graphRef = useRef<any>()
 
   // Persistence
@@ -85,7 +86,11 @@ export default function App() {
           return sId === node.id || tId === node.id
         }).length + 5
       })),
-      links: filteredLinks
+      links: filteredLinks.map(l => ({
+        ...l,
+        source: typeof l.source === 'object' ? (l.source as any).id : l.source,
+        target: typeof l.target === 'object' ? (l.target as any).id : l.target
+      }))
     }
   }, [nodes, links, search, activeFilters])
 
@@ -235,20 +240,52 @@ export default function App() {
                 onClick={() => {
                   try {
                     if (graphRef.current) {
+                      // Pour le mode 3D, il faut forcer le rendu avant la capture
+                      if (is3D) {
+                        graphRef.current.renderer().render(graphRef.current.scene(), graphRef.current.camera());
+                      }
+                      
                       const canvas = graphRef.current.getCanvasElement()
                       const img = canvas.toDataURL("image/png")
                       const link = document.createElement('a')
-                      link.download = 'mapy_apple_snapshot.png'
+                      link.download = `mapy_snapshot_${Date.now()}.png`
                       link.href = img
                       link.click()
                       toast.success("Snapshot Premium enregistré ! ")
                     }
-                  } catch (e) { toast.error("Erreur capture") }
+                  } catch (e) { 
+                    console.error(e);
+                    toast.error("Erreur capture");
+                  }
                 }}
                 className="flex flex-col items-center justify-center p-4 rounded-2xl bg-[#ffffff05] hover:bg-[#ffffff10] border border-[#ffffff10] group transition-apple"
               >
                 <ImageIcon size={22} className="text-[#86868b] group-hover:text-white transition-colors" />
                 <span className="text-[10px] mt-2 font-semibold uppercase tracking-wider">Capture</span>
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={() => setShowLegend(!showLegend)}
+                className={`flex items-center justify-center gap-2 p-3 rounded-2xl border transition-apple text-[10px] font-bold uppercase tracking-wider ${
+                  showLegend ? 'bg-[#ffffff10] border-[#ffffff20] text-white' : 'bg-[#ffffff05] border-[#ffffff10] text-[#86868b]'
+                }`}
+              >
+                <Info size={16} /> Légende
+              </button>
+              <button 
+                onClick={() => {
+                  if (window.confirm("Voulez-vous effacer TOUTES les données localement ?")) {
+                    setNodes([]);
+                    setLinks([]);
+                    localStorage.removeItem('rg_nodes');
+                    localStorage.removeItem('rg_links');
+                    toast.success("Données réinitialisées");
+                  }
+                }}
+                className="flex items-center justify-center gap-2 p-3 rounded-2xl bg-[#ff3b3010] border border-[#ff3b3020] hover:bg-[#ff3b3020] text-[10px] font-bold text-[#ff3b30] transition-apple uppercase tracking-wider"
+              >
+                <Trash2 size={16} /> Reset
               </button>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -486,28 +523,30 @@ export default function App() {
         </div>
 
         {/* Légende Dynamique Apple Style */}
-        <div className="absolute top-10 right-10 p-8 glass rounded-[32px] flex flex-col gap-5 pointer-events-none max-h-[80vh] overflow-y-auto w-64 border border-[#ffffff10] shadow-2xl">
-          <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#86868b] border-b border-[#ffffff05] pb-3">Légende</h4>
-          <div className="space-y-4">
-            {Object.entries(RELATION_TYPES).map(([type, color]) => (
-              <div key={type} className="flex items-center gap-4 text-[11px] font-semibold tracking-tight">
-                <span className="w-3.5 h-3.5 rounded-full shrink-0 border border-[#ffffff10]" style={{ backgroundColor: color, boxShadow: `0 0 15px ${color}40` }} /> 
-                <span className="truncate text-[#f5f5f7]/90">{type}</span>
+        {showLegend && (
+          <div className="absolute top-10 right-10 p-8 glass rounded-[32px] flex flex-col gap-5 pointer-events-none max-h-[80vh] overflow-y-auto w-64 border border-[#ffffff10] shadow-2xl animate-in fade-in slide-in-from-top-4 duration-500">
+            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#86868b] border-b border-[#ffffff05] pb-3">Légende</h4>
+            <div className="space-y-4">
+              {Object.entries(RELATION_TYPES).map(([type, color]) => (
+                <div key={type} className="flex items-center gap-4 text-[11px] font-semibold tracking-tight">
+                  <span className="w-3.5 h-3.5 rounded-full shrink-0 border border-[#ffffff10]" style={{ backgroundColor: color, boxShadow: `0 0 15px ${color}40` }} /> 
+                  <span className="truncate text-[#f5f5f7]/90">{type}</span>
+                </div>
+              ))}
+            </div>
+            <div className="h-[1px] bg-[#ffffff05] my-2" />
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 text-[11px] font-semibold">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#007aff] shadow-[0_0_15px_rgba(0,122,255,0.3)] border border-[#ffffff10]" /> 
+                <span className="text-[#f5f5f7]/90">Garçon</span>
               </div>
-            ))}
-          </div>
-          <div className="h-[1px] bg-[#ffffff05] my-2" />
-          <div className="space-y-4">
-             <div className="flex items-center gap-4 text-[11px] font-semibold">
-              <span className="w-3.5 h-3.5 rounded-full bg-[#007aff] shadow-[0_0_15px_rgba(0,122,255,0.3)] border border-[#ffffff10]" /> 
-              <span className="text-[#f5f5f7]/90">Garçon</span>
-            </div>
-            <div className="flex items-center gap-4 text-[11px] font-semibold">
-              <span className="w-3.5 h-3.5 rounded-full bg-[#ff2d55] shadow-[0_0_15px_rgba(255,45,85,0.3)] border border-[#ffffff10]" /> 
-              <span className="text-[#f5f5f7]/90">Fille</span>
+              <div className="flex items-center gap-4 text-[11px] font-semibold">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#ff2d55] shadow-[0_0_15px_rgba(255,45,85,0.3)] border border-[#ffffff10]" /> 
+                <span className="text-[#f5f5f7]/90">Fille</span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   )
