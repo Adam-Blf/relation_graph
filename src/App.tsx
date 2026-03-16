@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
 import * as XLSX from 'xlsx'
-import { Users, Download, Upload, Info, Box, Image as ImageIcon, Trash2 } from 'lucide-react'
+import { Users, Download, Upload, Info, Box, Image as ImageIcon, Trash2, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import ForceGraph3D from 'react-force-graph-3d'
 import { useCallback, useRef, useEffect } from 'react'
@@ -38,6 +38,8 @@ export default function App() {
     return saved ? JSON.parse(saved) : []
   })
   const [selectedNode, setSelectedNode] = useState<Person | null>(null)
+  const [pathStart, setPathStart] = useState<Person | null>(null)
+  const [pathResult, setPathResult] = useState<string[] | null>(null)
   const [filters, setFilters] = useState({ search: '', genre: 'Tous', relation: 'Toutes' })
   const [is3D, setIs3D] = useState(false)
   const graphRef = useRef<any>()
