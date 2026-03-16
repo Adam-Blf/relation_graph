@@ -11,14 +11,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#E11D48',    // Vibrant Rose
-        secondary: '#FB7185',  // Lighter Rose
-        accent: '#2563EB',     // Blue for links/action
-        background: '#0f0d13', // Deep Dark Background (customized)
-        foreground: '#FFF1F2', // Rose Tinted White
+        primary: '#CA8A04',    // Gold
+        secondary: '#A16207',  // Darker Gold
+        accent: '#CA8A04',     // Gold Action
+        background: '#0C0A09', // Stone Black
+        foreground: '#FAFAF9', // Stone White
       },
       fontFamily: {
-        fira: ['"Fira Code"', '"Fira Sans"', 'monospace'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        sans: ['"Inter"', 'sans-serif'],
       },
     },
   },

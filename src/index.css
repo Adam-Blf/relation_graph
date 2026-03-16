@@ -1,24 +1,52 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: 'Fira Sans', sans-serif;
+  /* Palette Stone & Gold - Liquid Glass */
+  --background: 12 10% 4%; /* #0C0A09 */
+  --foreground: 40 5% 96%;
+  --primary: 42 87% 41%; /* #CA8A04 - Gold */
+  --primary-foreground: 42 87% 10%;
+  
+  --accent: 42 87% 41%;
+  --accent-foreground: 42 87% 96%;
+  
+  --card: 12 10% 6%;
+  --card-foreground: 40 5% 96%;
+  
+  --border: 12 10% 15%;
+  --input: 12 10% 12%;
+  
+  /* Apple Design Palette */
+  --apple-bg: #000000;
+  --apple-surface: #1c1c1e;
+  --apple-surface-elevated: #2c2c2e;
+  --apple-text: #f5f5f7;
+  --apple-text-secondary: #86868b;
+  --apple-accent: #0071e3;
+  --apple-glass: rgba(28, 28, 30, 0.7);
+  --apple-border: rgba(255, 255, 255, 0.1);
+  --primary: #ca8a04;
+  --foreground: #f5f5f7;
+  --background: #000000;
 }
 
-code {
-  font-family: 'Fira Code', monospace;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  /* Apple Typography Stack */
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Icons", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  letter-spacing: -0.015em;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-  @apply bg-background text-foreground;
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  background-color: var(--apple-bg);
+  color: var(--apple-text);
+  overflow: hidden;
+  line-height: 1.47059;
 }
 
 #root {
@@ -26,21 +54,61 @@ body {
   height: 100vh;
 }
 
-/* Glassmorphism utility */
 .glass {
-  @apply bg-white/5 backdrop-blur-md border border-white/10;
+  background: var(--apple-glass);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border: 0.5px solid var(--apple-border);
 }
 
-/* Custom scrollbar */
+.glass-light {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+}
+
+.transition-apple {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Scrollbar Apple-style */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-white/20;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+input, select, textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border: 0.5px solid var(--apple-border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: white;
+  outline: none;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  border-color: var(--apple-accent);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 12px;
+  font-weight: 500;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+}
+
+button:active {
+  transform: scale(0.97);
 }

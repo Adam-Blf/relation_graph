@@ -1,86 +1,87 @@
 import { useState } from 'react'
-import { Link as LinkIcon } from 'lucide-react'
-import { toast } from 'sonner'
-
-interface Person {
-  id: string
-  nom: string
-}
+import { Link2, ChevronDown } from 'lucide-react'
+import { RELATION_TYPES } from './FilterPanel'
 
 interface AddRelationFormProps {
-  nodes: Person[]
+  nodes: any[]
   onAdd: (source: string, target: string, type: string) => void
 }
 
 export default function AddRelationForm({ nodes, onAdd }: AddRelationFormProps) {
   const [source, setSource] = useState('')
   const [target, setTarget] = useState('')
-  const [type, setType] = useState('Ont couché ensemble')
+  const [type, setType] = useState('Ami')
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!source || !target) {
-      toast.error('Sélectionnez deux personnes')
-      return
+    if (source && target && source !== target) {
+      onAdd(source, target, type)
+      setSource('')
+      setTarget('')
     }
-    if (source === target) {
-      toast.error('Une personne ne peut pas avoir de relation avec elle-même')
-      return
-    }
-    onAdd(source, target, type)
-    setSource('')
-    setTarget('')
-    toast.success('Relation ajoutée !')
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 p-4 rounded-xl bg-white/5 border border-white/5">
-      <h3 className="text-xs font-bold uppercase tracking-wider text-foreground/40 flex items-center gap-2">
-        <LinkIcon size={14} /> Ajouter une relation
-      </h3>
-      
-      <select
-        value={source}
-        onChange={(e) => setSource(e.target.value)}
-        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent/50 transition-colors appearance-none"
-      >
-        <option value="">Source...</option>
-        {nodes.map(n => <option key={n.id} value={n.id}>{n.nom}</option>)}
-      </select>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <label className="text-[11px] font-semibold text-apple-text-secondary uppercase tracking-wider ml-1">
+            Source
+          </label>
+          <div className="relative">
+            <select
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              className="w-full appearance-none pl-4 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-apple-accent/50 text-xs font-medium text-apple-text/80 cursor-pointer transition-apple"
+            >
+              <option value="" disabled className="bg-[#1c1c1e]">Choisir...</option>
+              {nodes.map(n => <option key={n.id} value={n.id} className="bg-[#1c1c1e] text-white">{n.nom}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-apple-text-secondary/40 pointer-events-none" size={14} />
+          </div>
+        </div>
 
-      <select
-        value={target}
-        onChange={(e) => setTarget(e.target.value)}
-        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent/50 transition-colors appearance-none"
-      >
-        <option value="">Cible...</option>
-        {nodes.map(n => <option key={n.id} value={n.id}>{n.nom}</option>)}
-      </select>
+        <div className="space-y-2">
+          <label className="text-[11px] font-semibold text-apple-text-secondary uppercase tracking-wider ml-1">
+            Cible
+          </label>
+          <div className="relative">
+            <select
+              value={target}
+              onChange={(e) => setTarget(e.target.value)}
+              className="w-full appearance-none pl-4 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-apple-accent/50 text-xs font-medium text-apple-text/80 cursor-pointer transition-apple"
+            >
+              <option value="" disabled className="bg-[#1c1c1e]">Choisir...</option>
+              {nodes.map(n => <option key={n.id} value={n.id} className="bg-[#1c1c1e] text-white">{n.nom}</option>)}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-apple-text-secondary/40 pointer-events-none" size={14} />
+          </div>
+        </div>
+      </div>
 
-      <select
-        value={type}
-        onChange={(e) => setType(e.target.value)}
-        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent/50 transition-colors appearance-none"
-      >
-        <option value="Ami">Ami</option>
-        <option value="Ennemi">Ennemi</option>
-        <option value="Crush">Crush</option>
-        <option value="Crush réciproque">Crush réciproque</option>
-        <option value="Flirt">Flirt</option>
-        <option value="Ex">Ex</option>
-        <option value="Famille">Famille</option>
-        <option value="Pro">Pro</option>
-        <option value="Rivalité">Rivalité</option>
-        <option value="Ont couché ensemble">Ont couché ensemble</option>
-        <option value="Se sont embrassé">Se sont embrassé</option>
-        <option value="Sont sortie ensemble">Sont sortie ensemble</option>
-      </select>
+      <div className="space-y-2">
+        <label className="text-[11px] font-semibold text-apple-text-secondary uppercase tracking-wider ml-1">
+          Type de Relation
+        </label>
+        <div className="relative">
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="w-full appearance-none pl-4 pr-10 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-apple-accent/50 text-xs font-medium text-apple-text/80 cursor-pointer transition-apple"
+          >
+            {Object.keys(RELATION_TYPES).map(t => <option key={t} value={t} className="bg-[#1c1c1e] text-white">{t}</option>)}
+          </select>
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-apple-text-secondary/40 pointer-events-none" size={14} />
+        </div>
+      </div>
 
       <button
         type="submit"
-        className="w-full py-2 bg-accent text-white rounded-lg text-xs font-bold hover:bg-accent/90 transition-colors mt-2"
+        disabled={!source || !target || source === target}
+        className="w-full py-3.5 bg-white/5 border border-white/10 rounded-xl font-semibold text-sm hover:bg-white/10 hover:border-apple-accent/30 text-apple-accent transition-apple disabled:opacity-20 flex items-center justify-center gap-2"
       >
-        Créer le lien
+        <Link2 size={18} />
+        Créer la Connexion
       </button>
     </form>
   )

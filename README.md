@@ -1,51 +1,41 @@
-# Relation Graph 📊
+#  Mapy - Social Visualizer (Apple Edition)
 
-![Version](https://img.shields.io/badge/version-0.2.0-blue)
-![Status](https://img.shields.io/badge/status-ready-success)
+![Version](https://img.shields.io/badge/version-0.6.0-blue?style=for-the-badge&logo=apple)
+![License](https://img.shields.io/badge/license-ISC-green?style=for-the-badge)
 
-Visualisation interactive des relations sociales entre individus sous forme de graphe à nœuds.
+Mapy est un visualiseur de relations sociales 3D haute performance, conçu avec l'esthétique et la fluidité d'Apple.
 
-## 🚀 Fonctionnalités
+## 🚀 Fonctionnalités v0.6.0
 
-- **Filtres Avancés** : Recherche par nom, filtrage par genre et type de relation.
-- **AI Analyzer** : Module d'analyse structurelle du graphe et accès aux ressources LLM gratuites.
-- **Types de Relations Étendus** : 12 types de relations (Ami, Crush, Rivalité, etc.).
-- **Graphe Interactif** : Visualisation 2D dynamique avec zoom et physique.
-- **Design Premium** : Interface Dark Mode avec effets de flou (Glassmorphism).
-- **Légende Sémantique** : Couleurs distinctes pour les types de relations.
+- **Design Apple** : Interface minimaliste, Liquid Glass UI, typographie San Francisco.
+- **Visualisation 2D/3D** : Basculez instantanément entre un graphe 2D précis et une expérience 3D immersive.
+- **Import/Export Excel** : Gérez vos données via des fichiers Excel compatibles.
+- **Social Pathfinding** : Trouvez le chemin le plus court entre deux individus.
+- **Intelligence Artificielle** : Analyse automatique des clusters et des leaders du réseau.
+- **Snapshot Premium** : Capturez votre graphe en haute résolution.
 
-## 🛠 Tech Stack
+## 🛠️ Installation & Démarrage
 
-- **Frontend** : React 18, TypeScript, Vite.
-- **Visualisation** : `react-force-graph-2d`.
-- **Données** : `SheetJS` (xlsx).
-- **UI/Styling** : Tailwind CSS, Lucide React, Sonner (Toasts).
+```bash
+# Installation des dépendances
+npm install
 
-## 📦 Installation
+# Démarrage en mode développement (Vite)
+npm run dev
 
-1. **Cloner le repo** :
-   ```bash
-   git clone https://github.com/Adam-Blf/relation_graph.git
-   ```
+# Démarrage de l'application Electron
+npm run electron:dev
 
-2. **Installer les dépendances** :
-   ```bash
-   npm install
-   ```
+# Build de l'exécutable portable (.exe)
+npm run electron:build
+```
 
-3. **Lancer le serveur de développement** :
-   ```bash
-   npm run dev
-   ```
+## 🎨 Conception
 
-## 📄 Format des données Excel
+Conçu par **Adam Beloucif** pour offrir une expérience utilisateur fluide et premium.
+- Basé sur `React`, `Three.js` et `Vite`.
+- Styles via `TailwindCSS` (Custom Apple Tokens).
+- Icônes `Lucide React`.
 
-Le fichier doit contenir les colonnes suivantes :
-- `Source_ID`, `Source_Nom`, `Source_Genre`
-- `Target_ID`, `Target_Nom`, `Target_Genre`
-- `Type_Relation`
-
-## 👨‍💻 Auteur
-
-**Adam Beloucif**
-Visualisation orientée graphes et analyse relationnelle.
+---
+© 2024 Adam Beloucif. Tous droits réservés.

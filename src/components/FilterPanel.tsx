@@ -1,94 +1,77 @@
-import React from 'react';
-import { Search, Filter, X } from 'lucide-react';
+import React from 'react'
+import { Search, Filter, X } from 'lucide-react'
 
-export const RELATION_TYPES = {
-  "Ami": "#10B981",
-  "Ennemi": "#6B7280",
-  "Crush": "#F472B6",
-  "Crush réciproque": "#EC4899",
-  "Flirt": "#FBBF24",
-  "Ex": "#EF4444",
-  "Famille": "#3B82F6",
-  "Pro": "#8B5CF6",
-  "Rivalité": "#F97316",
-  "Ont couché ensemble": "#B91C1C",
-  "Se sont embrassé": "#DB2777",
-  "Sont sortie ensemble": "#7C3AED"
+export const RELATION_TYPES: Record<string, string> = {
+  "Ex": "#EF4444",              // Rouge
+  "Ont couché ensemble": "#EC4899", // Rose
+  "Se sont embrassé": "#F59E0B",   // Ambre
+  "Sont sortie ensemble": "#10B981" // Émeraude
 };
 
 interface FilterPanelProps {
-  onFilterChange: (filters: { search: string; genre: string; relation: string }) => void;
+  search: string
+  onSearch: (s: string) => void
+  activeFilters: string[]
+  onFilterToggle: (type: string) => void
 }
 
-export default function FilterPanel({ onFilterChange }: FilterPanelProps) {
-  const [search, setSearch] = React.useState('');
-  const [genre, setGenre] = React.useState('Tous');
-  const [relation, setRelation] = React.useState('Toutes');
-
-  const handleChange = (s: string, g: string, r: string) => {
-    onFilterChange({ search: s, genre: g, relation: r });
-  };
-
+const FilterPanel: React.FC<FilterPanelProps> = ({ search, onSearch, activeFilters, onFilterToggle }) => {
   return (
-    <section className="space-y-4 animate-in fade-in slide-in-from-left-2 duration-500">
-      <h2 className="text-[10px] font-semibold text-foreground/40 uppercase tracking-widest flex items-center gap-2">
-        <Filter size={14} /> Filtres Avancés
-      </h2>
-      
+    <div className="space-y-6">
+      {/* Recherche */}
+      <div className="relative group">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/20 group-focus-within:text-primary transition-colors" size={16} />
+        <input
+          type="text"
+          placeholder="Rechercher un nom..."
+          value={search}
+          onChange={(e) => onSearch(e.target.value)}
+          className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-luxury text-sm placeholder:text-foreground/20 font-medium"
+        />
+        {search && (
+          <button onClick={() => onSearch('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-foreground/20 hover:text-white transition-luxury">
+            <X size={14} />
+          </button>
+        )}
+      </div>
+
+      {/* Chips de filtrage */}
       <div className="space-y-3">
-        {/* Recherche */}
-        <div className="relative group">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30 group-focus-within:text-primary transition-colors" />
-          <input 
-            type="text" 
-            placeholder="Rechercher un nom..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              handleChange(e.target.value, genre, relation);
-            }}
-            className="w-full bg-white/5 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all shadow-inner"
-          />
-          {search && (
-            <button 
-              onClick={() => { setSearch(''); handleChange('', genre, relation); }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-white"
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-foreground/30 px-1">
+          <Filter size={12} />
+          Types de liens
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {Object.keys(RELATION_TYPES).map(type => {
+            const isActive = activeFilters.includes(type)
+            const color = RELATION_TYPES[type]
+            return (
+              <button
+                key={type}
+                onClick={() => onFilterToggle(type)}
+                style={{ 
+                  borderColor: isActive ? color : 'rgba(255,255,255,0.05)',
+                  backgroundColor: isActive ? `${color}15` : 'rgba(255,255,255,0.03)',
+                  color: isActive ? color : 'rgba(255,255,255,0.4)'
+                }}
+                className="px-3 py-1.5 rounded-full text-[10px] font-bold border transition-luxury hover:scale-105 active:scale-95"
+              >
+                {type}
+              </button>
+            )
+          })}
+          {activeFilters.length > 0 && (
+            <button
+              onClick={() => onFilterToggle('CLEAR')}
+              className="px-3 py-1.5 rounded-full text-[10px] font-bold border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-luxury"
             >
-              <X size={14} />
+              Effacer ({activeFilters.length})
             </button>
           )}
         </div>
-
-        {/* Genre */}
-        <div className="grid grid-cols-3 gap-1 bg-white/5 p-1 rounded-xl border border-white/5">
-          {['Tous', 'Garçon', 'Fille'].map((g) => (
-            <button
-              key={g}
-              onClick={() => { setGenre(g); handleChange(search, g, relation); }}
-              className={`py-1.5 text-[10px] rounded-lg transition-all ${
-                genre === g ? 'bg-primary text-white shadow-lg' : 'text-foreground/50 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              {g}
-            </button>
-          ))}
-        </div>
-
-        {/* Relation */}
-        <select 
-          value={relation}
-          onChange={(e) => {
-            setRelation(e.target.value);
-            handleChange(search, genre, e.target.value);
-          }}
-          className="w-full bg-white/5 border border-white/5 rounded-xl py-2 px-3 text-sm focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all appearance-none cursor-pointer"
-        >
-          <option value="Toutes">Toutes les relations</option>
-          {Object.keys(RELATION_TYPES).map(type => (
-            <option key={type} value={type}>{type}</option>
-          ))}
-        </select>
       </div>
-    </section>
-  );
+    </div>
+  )
 }
+
+export default FilterPanel
