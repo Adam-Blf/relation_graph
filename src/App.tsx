@@ -202,7 +202,8 @@ export default function App() {
             </h2>
             <AddPersonForm onAdd={(nom: string, genre: 'Garçon' | 'Fille') => {
               const id = `P${Date.now()}`
-              setNodes([...nodes, { id, nom, genre }])
+              setNodes(prev => [...prev, { id, nom, genre }])
+              toast.success(`${nom} ajouté au réseau !`)
             }} />
           </div>
 
@@ -215,7 +216,8 @@ export default function App() {
             <AddRelationForm 
               nodes={nodes} 
               onAdd={(source: string, target: string, type: string) => {
-                setLinks([...links, { source, target, type }])
+                setLinks(prev => [...prev, { source, target, type }])
+                toast.success("Relation créée ! ✨")
               }} 
             />
           </div>
@@ -400,13 +402,16 @@ export default function App() {
                   <button 
                     onClick={() => {
                       if (window.confirm(`Supprimer ${selectedNode.nom} ?`)) {
-                        setNodes(nodes.filter(n => n.id !== selectedNode.id));
-                        setLinks(links.filter(l => {
+                        const nodeIdToDelete = selectedNode.id;
+                        setSelectedNode(null);
+                        
+                        setNodes(prev => prev.filter(n => n.id !== nodeIdToDelete));
+                        setLinks(prev => prev.filter(l => {
                           const sId = typeof l.source === 'object' ? (l.source as any).id : l.source;
                           const tId = typeof l.target === 'object' ? (l.target as any).id : l.target;
-                          return sId !== selectedNode.id && tId !== selectedNode.id;
+                          return sId !== nodeIdToDelete && tId !== nodeIdToDelete;
                         }));
-                        setSelectedNode(null);
+                        
                         toast.success("Individu supprimé");
                       }
                     }} 
