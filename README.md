@@ -1,7 +1,11 @@
 #  Mapy - Social Visualizer (Apple Edition)
 
-![Version](https://img.shields.io/badge/version-0.6.0-blue?style=for-the-badge&logo=apple)
-![License](https://img.shields.io/badge/license-ISC-green?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
+![Three.js](https://img.shields.io/badge/Three.js-000000?logo=threedotjs&logoColor=white)
+![License](https://img.shields.io/badge/license-ISC-green)
 
 Mapy est un visualiseur de relations sociales 3D haute performance, conçu avec l'esthétique et la fluidité d'Apple.
 
