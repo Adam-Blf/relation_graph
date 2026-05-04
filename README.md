@@ -1,5 +1,10 @@
 #  Mapy - Social Visualizer (Apple Edition)
 
+<!-- adam-badges:start -->
+[![commits](https://img.shields.io/github/commit-activity/t/Adam-Blf/relation_graph?color=001329&label=commits&style=flat-square)](https://github.com/Adam-Blf/relation_graph/commits) [![visites](https://hits.sh/github.com/Adam-Blf/relation_graph.svg?style=flat-square&label=visites&color=001329)](https://hits.sh/github.com/Adam-Blf/relation_graph/) [![last commit](https://img.shields.io/github/last-commit/Adam-Blf/relation_graph?color=D4A437&style=flat-square&label=dernier%20push)](https://github.com/Adam-Blf/relation_graph/commits) [![top language](https://img.shields.io/github/languages/top/Adam-Blf/relation_graph?style=flat-square)](https://github.com/Adam-Blf/relation_graph) [![license](https://img.shields.io/github/license/Adam-Blf/relation_graph?style=flat-square&color=D4A437)](LICENSE)
+<!-- adam-badges:end -->
+
+
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![React](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
