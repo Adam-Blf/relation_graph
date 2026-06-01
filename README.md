@@ -14,6 +14,28 @@
 
 Mapy est un visualiseur de relations sociales 3D haute performance, conçu avec l'esthétique et la fluidité d'Apple.
 
+## Architecture
+
+```mermaid
+flowchart TB
+    EL["electron/main.cjs<br/>fenêtre desktop · build portable .exe"]
+    APP["src/App.tsx<br/>React 18 · Vite · état global"]
+    FORMS["AddPersonForm · AddRelationForm<br/>saisie individus · relations"]
+    FILTER["FilterPanel<br/>filtres réseau"]
+    AI["AIAnalysisSection<br/>clusters · leaders du réseau"]
+    PATH["utils/pathfinding<br/>plus court chemin social"]
+    GRAPH["react-force-graph 2D/3D<br/>Three.js · rendu immersif"]
+    XLSX["xlsx<br/>import / export Excel"]
+
+    EL --> APP
+    APP --> FORMS
+    APP --> FILTER --> GRAPH
+    APP --> GRAPH
+    APP --> AI
+    APP --> PATH
+    APP --> XLSX
+```
+
 ## 🚀 Fonctionnalités v0.6.0
 
 - **Design Apple** : Interface minimaliste, Liquid Glass UI, typographie San Francisco.
